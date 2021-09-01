@@ -1,8 +1,12 @@
 import React from 'react';
-import { Button, Col, Container, Form, Row} from 'react-bootstrap';
 import './App.css';
 import Task from './components/Task';
 import  HttpClient  from "./api/http-client";
+import Nav from './components/Nav';
+import Title from './components/Title';
+import Input from './components/Input';
+import Button from './components/Button';
+import ButtonIcon from './components/ButtonIcon';
 
 class App extends React.Component {
   constructor(props){
@@ -20,13 +24,13 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    HttpClient.get(``)
+    /*HttpClient.get(``)
       .then((response) => {
         this.setState({data:response.data})
       })
       .catch((error) =>{
         console.error(error)
-      })
+      })*/
   }
 
   addTask(e){
@@ -59,8 +63,7 @@ class App extends React.Component {
   renderTasks(){
     if(this.state.tasks.length>0) return (
         <div>
-          <hr />
-          <h3>Tasks</h3>
+          <Title title="Tasks" />
           {
             this.state.tasks.map( (desc,index) =>{
               const props = {
@@ -82,30 +85,21 @@ class App extends React.Component {
 
   render(){
     return (
-      <Container className="pt-3">
-        <Row>
-          <Col>
-            <h1>Todo List</h1>
-            <br />
-            <h3>Add Item</h3>
-            <Row>
-              <Form>
-                <Col>
-                  <input id="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc}/>
-                </Col>
-                <Col>
-                  <Button type="submit" onClick={e=>this.addTask(e)}>Add</Button>
-                </Col>
-              </Form>
-
-            </Row>
+      <div className="bg-gray-70 h-full text-gray-800">
+        <Nav title="Todo List"></Nav>
+        <div className="p-10 pt-20 h-full text-gray-800">
+          <Title title="Add Item" />
+              <form className="flex space-x-5 pb-10">
+                  <Input id="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
+                  <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-green-500"/>
+              </form>
             {this.renderTasks()}
             <pre>
               {JSON.stringify(this.state)}
             </pre>
-          </Col>
-        </Row>
-      </Container>
+        </div>
+
+      </div>
     );
   }
 

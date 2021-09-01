@@ -1,34 +1,48 @@
-import { Button, Col, Row} from 'react-bootstrap';
+import { useState } from "react";
+import Button from "./Button";
+import ButtonIcon from "./ButtonIcon";
+import Checkbox from "./Checkbox";
+import Input from "./Input";
 
 function Task(props){
+	let [showOpt, setShowOpt] = useState(false);
 	function renderButtons() {
 		return (props.editable)?
-			<div>
-				<Button onClick={()=>props.removeTask(props.index)}>Remove</Button>
-            	<Button onClick={()=>props.saveTask() }>Save</Button>
+			<div className="flex space-x-2">
+				<ButtonIcon onClick={()=>props.removeTask(props.index)} icon="carbon:delete" textColor="text-red-500"/>
+				<ButtonIcon onClick={()=>props.saveTask()} icon="carbon:save" textColor="text-green-500"/>
 			</div>
 		:
-			<div>
-				<Button onClick={()=>props.removeTask(props.index)}>Remove</Button>
-				<Button onClick={()=>props.editTask(props.index)}>Edit</Button>
+			<div className="flex space-x-2">
+				<ButtonIcon onClick={()=>props.removeTask(props.index)} icon="carbon:delete" textColor="text-red-500"/>
+				<ButtonIcon onClick={()=>props.editTask(props.index)} icon="carbon:edit" textColor="text-blue-500"/>
 			</div>
 	}
 	function renderLabel() {
 		return (props.editable)?
-            <input id="editingTask" onChange={(e)=>props.updateTask(props.index, e.target.value)} value={props.desc}/>
+		<div className="w-full flex overflow-hidden">
+        	<Input id="taskDesc" onChange={e=>props.updateTask(props.index, e.target.value)} value={props.desc} />
+		</div>
 		:
-			<span>{props.desc}</span>
+		<div className="w-full flex overflow-hidden">
+			<span className="m-auto ml-0">
+				{props.desc}
+			</span>
+		</div>
 	}
 
+	function toggleOptions() {
+		setShowOpt(!showOpt);	
+	}
 	return(
-		<Row key={props.index} className="p-2">
-			<Col >
+    	<div className={`mt-2 ${props.size} relative p-2 flex space-x-2 w-full rounded-lg border-2 border-gray-200`} key={props.index}>
+			<Checkbox />
+			{renderLabel()}
+			<ButtonIcon icon="carbon:overflow-menu-vertical" background="" textColor="text-gray-500" onClick={()=>toggleOptions()}/>
+			<div className={` ${showOpt?'block':'hidden'} absolute -right-3 -top-8 rounded-lg border-2 border-gray-200 bg-gray-100`}>
 				{renderButtons()}
-			</Col>
-			<Col>
-				{renderLabel()}
-			</Col>
-		</Row>
+			</div>
+    	</div>
 	)
 }
 
