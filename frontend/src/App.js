@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, Col, Container, Row} from 'react-bootstrap';
+import { Button, Col, Container, Form, Row} from 'react-bootstrap';
 import './App.css';
 import Task from './components/Task';
+import  HttpClient  from "./api/http-client";
 
 class App extends React.Component {
   constructor(props){
@@ -17,7 +18,19 @@ class App extends React.Component {
       tasks: []
     }
   }
-  addTask(){
+
+  componentDidMount(){
+    HttpClient.get(``)
+      .then((response) => {
+        this.setState({data:response.data})
+      })
+      .catch((error) =>{
+        console.error(error)
+      })
+  }
+
+  addTask(e){
+    e.preventDefault();
     if(this.state.taskDesc==='') return;
     let tasks = this.state.tasks;
     tasks.push(this.state.taskDesc);
@@ -76,12 +89,15 @@ class App extends React.Component {
             <br />
             <h3>Add Item</h3>
             <Row>
-              <Col>
-                <input id="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc}/>
-              </Col>
-              <Col>
-                <Button onClick={this.addTask}>Add</Button>
-              </Col>
+              <Form>
+                <Col>
+                  <input id="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc}/>
+                </Col>
+                <Col>
+                  <Button type="submit" onClick={e=>this.addTask(e)}>Add</Button>
+                </Col>
+              </Form>
+
             </Row>
             {this.renderTasks()}
             <pre>
