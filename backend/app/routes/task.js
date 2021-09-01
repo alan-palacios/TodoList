@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const TaskController = require('../controllers/task')
+
+//add task
+router.post('/', async (req, resp, next) => {
+    if(req.body == null ){
+        return resp.status(400).json({status:"error", description:"Wrong parameters"});
+    }else{
+        const response = await TaskController.addTask(req.body);
+        if(response === -3 || response === -2)
+            return resp.status(500).json({status: "error", description: "Database connection error"});
+        else
+            return resp.status(200).send({status: "ok", data: response});
+    }   
+});
 //get task
 router.get('/:id', async (req, resp, next) => {
     if(req.params == null ){
@@ -15,12 +28,13 @@ router.get('/:id', async (req, resp, next) => {
             return resp.status(200).send({status: "ok", data: response});
     }   
 });
-//add task
-router.post('/', async (req, resp, next) => {
+
+//update task
+router.put('/:id', async (req, resp, next) => {
     if(req.body == null ){
         return resp.status(400).json({status:"error", description:"Wrong parameters"});
     }else{
-        const response = await TaskController.addTask(req.body);
+        const response = await TaskController.updateTaskById(req.params.id, req.body);
         if(response === -3 || response === -2)
             return resp.status(500).json({status: "error", description: "Database connection error"});
         else
@@ -28,11 +42,11 @@ router.post('/', async (req, resp, next) => {
     }   
 });
 //delete task
-router.delete('/', async (req, resp, next) => {
+router.delete('/:id', async (req, resp, next) => {
     if(req.body == null ){
         return resp.status(400).json({status:"error", description:"Wrong parameters"});
     }else{
-        const response = await TaskController.deleteTaskById(req.body);
+        const response = await TaskController.deleteTaskById(req.params);
         if(response === -3 || response === -2)
             return resp.status(500).json({status: "error", description: "Database connection error"});
         else

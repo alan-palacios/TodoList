@@ -34,17 +34,20 @@ module.exports = {
             return -2;
         }
     },
-    updateTaskById:async function(email, password){
+    updateTaskById:async function(id, {description, completed}){
         try{
-            const userId = await User.findOne({email, password}, '_id');
-            console.log(userId);
-            if(!userId) return -1;
+			const updatedTask={
+				description,
+				completed
+			}
+            const taskExist = await Task.findOne({_id: new mongoose.Types.ObjectId(id)});
+            if(!taskExist) return -1;
             else{
-                const user = await this.getUserById(userId._id);
-                if(user === -1 || user === -2)
-                    return -2;
-                else
-                    return user;
+                const task = await Task.findByIdAndUpdate(id, {
+                    $set: updatedTask,
+                }, {new:true});
+                if(!taskExist) return -1;
+                else return task;
             }
         }catch(error){
             console.log(error);
