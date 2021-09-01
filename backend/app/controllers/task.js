@@ -14,17 +14,17 @@ module.exports = {
             return -2;
         }
     },
-    /*getUserById:async function(id){
+    getTaskById:async function({id}){
         try{
-            const user = await User.findOne({_id: new mongoose.Types.ObjectId(id)}, 'createdRecipes _id username email type');
-            if(!user) return -1;
-            else return user;
+            const task = await Task.findOne({_id: new mongoose.Types.ObjectId(id)});
+            if(!task) return -1;
+            else return task;
         }catch(error){
             console.log(error);
             return -2;
         }
     },
-    getUserByEmailAndPassword:async function(email, password){
+    deletTaskById:async function(email, password){
         try{
             const userId = await User.findOne({email, password}, '_id');
             console.log(userId);
@@ -40,5 +40,5 @@ module.exports = {
             console.log(error);
             return -3;
         }
-    },*/
+    }
 };
