@@ -24,13 +24,13 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    /*HttpClient.get(``)
+    HttpClient.get(`tasks`)
       .then((response) => {
         this.setState({data:response.data})
       })
       .catch((error) =>{
         console.error(error)
-      })*/
+      })
   }
 
   addTask(e){

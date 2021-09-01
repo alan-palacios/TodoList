@@ -14,6 +14,26 @@ module.exports = {
             return -2;
         }
     },
+    getTasks:async function(){
+        try{
+            const tasks = await Task.find({});
+            if(!tasks) return -1;
+            else return tasks;
+        }catch(error){
+            console.log(error);
+            return -2;
+        }
+    },
+    getTasksByQuery:async function({completed}){
+        try{
+            const task = await Task.findOne({completed});
+            if(!task) return -1;
+            else return task;
+        }catch(error){
+            console.log(error);
+            return -2;
+        }
+    },
     getTaskById:async function({id}){
         try{
             const task = await Task.findOne({_id: new mongoose.Types.ObjectId(id)});
