@@ -24,7 +24,17 @@ module.exports = {
             return -2;
         }
     },
-    deletTaskById:async function(email, password){
+    deleteTaskById:async function({id}){
+        try{
+            const task = await Task.findOneAndDelete({_id: new mongoose.Types.ObjectId(id)});
+            if(!task) return -1;
+            else return task;
+        }catch(error){
+            console.log(error);
+            return -2;
+        }
+    },
+    updateTaskById:async function(email, password){
         try{
             const userId = await User.findOne({email, password}, '_id');
             console.log(userId);

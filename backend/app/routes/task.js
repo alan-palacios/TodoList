@@ -27,6 +27,17 @@ router.post('/', async (req, resp, next) => {
             return resp.status(200).send({status: "ok", data: response});
     }   
 });
-
+//delete task
+router.delete('/', async (req, resp, next) => {
+    if(req.body == null ){
+        return resp.status(400).json({status:"error", description:"Wrong parameters"});
+    }else{
+        const response = await TaskController.deleteTaskById(req.body);
+        if(response === -3 || response === -2)
+            return resp.status(500).json({status: "error", description: "Database connection error"});
+        else
+            return resp.status(200).send({status: "ok", data: response});
+    }   
+});
 
 module.exports = router;
