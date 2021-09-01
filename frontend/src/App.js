@@ -5,7 +5,6 @@ import  HttpClient  from "./api/http-client";
 import Nav from './components/Nav';
 import Title from './components/Title';
 import Input from './components/Input';
-import Button from './components/Button';
 import ButtonIcon from './components/ButtonIcon';
 
 class App extends React.Component {
@@ -16,6 +15,7 @@ class App extends React.Component {
     this.editTask = this.editTask.bind(this);
     this.updateTask = this.updateTask.bind(this);
     this.saveTask = this.saveTask.bind(this);
+    this.checkboxChangeHandler = this.checkboxChangeHandler.bind(this);
     this.state = {
       taskDesc: '',
       editing: -1,
@@ -24,9 +24,9 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    HttpClient.get(`tasks`)
+    HttpClient.get(`task`)
       .then((response) => {
-        this.setState({data:response.data})
+        this.setState({tasks:response.data.data})
       })
       .catch((error) =>{
         console.error(error)
@@ -36,14 +36,21 @@ class App extends React.Component {
   addTask(e){
     e.preventDefault();
     if(this.state.taskDesc==='') return;
-    let tasks = this.state.tasks;
-    tasks.push(this.state.taskDesc);
-    this.setState({"tasks":tasks, taskDesc:''});
+    HttpClient.post(`task`,{description:this.state.taskDesc})
+      .then((response) => {
+        let tasks = [...this.state.tasks];
+        tasks.push(response.data.data);
+        this.setState({tasks, taskDesc:''});
+      })
+      .catch((error) =>{
+        console.error(error)
+      })
+
   }
   removeTask(index){
     let tasks = this.state.tasks;
     tasks.splice(index,1);
-    this.setState({"tasks":tasks, editing:-1});
+    this.setState({tasks, editing:-1});
   }
   editTask(index){
     this.setState({editing:index, editingTask:this.state.tasks[index]});
@@ -57,29 +64,57 @@ class App extends React.Component {
     this.setState({editing:-1});
   }
   handleChange(e){
-    this.setState({[e.target.id]: e.target.value});
+    this.setState({[e.target.name]: e.target.value});
   }
-
+  checkboxChangeHandler(e){
+    this.setState({[e.target.name]: e.target.checked});
+  }
   renderTasks(){
     if(this.state.tasks.length>0) return (
-        <div>
-          <Title title="Tasks" />
+      <div>
+        <div className="mb-5">
+          <Title title="To do" />
           {
-            this.state.tasks.map( (desc,index) =>{
+            this.state.tasks.map( (task,index) =>{
+              if(task.completed) return "";
               const props = {
                 index,
-                desc:this.state.tasks[index],
+                desc:task.description,
+                completed: task.completed,
                 editable: this.state.editing===index,
                 removeTask: this.removeTask,
                 editTask: this.editTask,
                 updateTask: this.updateTask,
                 handleChange: this.handleChange,
+                checkboxChangeHandler: this.checkboxChangeHandler,
                 saveTask: this.saveTask,
               }
               return <Task key={index} {...props}/>
             })
           }
         </div>
+        <div>
+          <Title title="Completed" />
+          {
+            this.state.tasks.map( (task,index) =>{
+              if(!task.completed) return "";
+              const props = {
+                index,
+                desc:task.description,
+                completed: task.completed,
+                editable: this.state.editing===index,
+                removeTask: this.removeTask,
+                editTask: this.editTask,
+                updateTask: this.updateTask,
+                handleChange: this.handleChange,
+                checkboxChangeHandler: this.checkboxChangeHandler,
+                saveTask: this.saveTask,
+              }
+              return <Task key={index} {...props}/>
+            })
+          }
+        </div>
+      </div>
       )
   }
 
@@ -90,12 +125,12 @@ class App extends React.Component {
         <div className="p-10 pt-20 h-full text-gray-800">
           <Title title="Add Item" />
               <form className="flex space-x-5 pb-10">
-                  <Input id="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
+                  <Input name="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
                   <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-green-500"/>
               </form>
             {this.renderTasks()}
             <pre>
-              {JSON.stringify(this.state)}
+              {JSON.stringify(this.state,null,2)}
             </pre>
         </div>
 

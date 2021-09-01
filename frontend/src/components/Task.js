@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Button from "./Button";
 import ButtonIcon from "./ButtonIcon";
 import Checkbox from "./Checkbox";
 import Input from "./Input";
@@ -21,7 +20,7 @@ function Task(props){
 	function renderLabel() {
 		return (props.editable)?
 		<div className="w-full flex overflow-hidden">
-        	<Input id="taskDesc" onChange={e=>props.updateTask(props.index, e.target.value)} value={props.desc} />
+        	<Input name="taskDesc" onChange={e=>props.updateTask(props.index, e.target.value)} value={props.desc} />
 		</div>
 		:
 		<div className="w-full flex overflow-hidden">
@@ -36,7 +35,7 @@ function Task(props){
 	}
 	return(
     	<div className={`mt-2 ${props.size} relative p-2 flex space-x-2 w-full rounded-lg border-2 border-gray-200`} key={props.index}>
-			<Checkbox />
+			<Checkbox value={props.completed} checkboxChangeHandler={props.checkboxChangeHandler}/>
 			{renderLabel()}
 			<ButtonIcon icon="carbon:overflow-menu-vertical" background="" textColor="text-gray-500" onClick={()=>toggleOptions()}/>
 			<div className={` ${showOpt?'block':'hidden'} absolute -right-3 -top-8 rounded-lg border-2 border-gray-200 bg-gray-100`}>
