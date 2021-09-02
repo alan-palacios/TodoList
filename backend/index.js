@@ -11,6 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/', require('./app/routes/routes'));
 
-app.listen(5000, () => {
+app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
