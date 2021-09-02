@@ -187,7 +187,7 @@ class App extends React.Component {
   render(){
     return (
       <div className="bg-gray-70 h-full text-purple-900">
-        <Nav title="To do List"></Nav>
+        <Nav title="To do"></Nav>
         <div className="p-10 pt-20 h-full text-purple-900
                         sm:p-20
                         lg:pt-24">

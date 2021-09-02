@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 axios.defaults.timeout = 4000; // for all requests
-const urlBase = 'http://localhost:5000'
+//const urlBaseDev = 'http://localhost:5000';
+const urlBase = 'https://apyolt-api-todolist.herokuapp.com';
 const commonHeaders ={
   Accept: 'application/json',
   'Content-Type': 'application/json',
