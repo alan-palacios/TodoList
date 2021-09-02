@@ -55,7 +55,6 @@ class App extends React.Component {
       .catch((error) =>{
         console.error(error)
       })
-
   }
   editTask(index){
     this.setState({editing:index, editingTask:this.state.tasks[index]});
@@ -71,8 +70,24 @@ class App extends React.Component {
   handleChange(e){
     this.setState({[e.target.name]: e.target.value});
   }
-  checkboxChangeHandler(e){
-    this.setState({[e.target.name]: e.target.checked});
+  checkboxChangeHandler(index){
+    let updatedTask = {...this.state.tasks[index]};
+    updatedTask.completed = !updatedTask.completed;
+    HttpClient.put(`task/${updatedTask._id}`, updatedTask)
+      .then((response) => {
+        const tasks = this.state.tasks.map((task, j) =>
+        {
+          if (index===j) {
+          return response.data.data;    
+          } else {
+            return task;
+          }
+        });
+        this.setState({tasks, editing:-1});
+      })
+      .catch((error) =>{
+        console.error(error)
+      })
   }
   renderTasks(){
     if(this.state.tasks.length>0) return (
@@ -91,7 +106,7 @@ class App extends React.Component {
                 editTask: this.editTask,
                 updateTask: this.updateTask,
                 handleChange: this.handleChange,
-                checkboxChangeHandler: this.checkboxChangeHandler,
+                checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
                 saveTask: this.saveTask,
               }
               return <Task key={index} {...props}/>
@@ -112,7 +127,7 @@ class App extends React.Component {
                 editTask: this.editTask,
                 updateTask: this.updateTask,
                 handleChange: this.handleChange,
-                checkboxChangeHandler: this.checkboxChangeHandler,
+                checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
                 saveTask: this.saveTask,
               }
               return <Task key={index} {...props}/>
