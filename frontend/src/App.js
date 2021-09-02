@@ -47,8 +47,15 @@ class App extends React.Component {
 
   }
   removeTask(index){
-    const tasks = this.state.tasks.filter((task, j) => index !== j);
-    this.setState({tasks, editing:-1});
+    HttpClient.delete(`task/${this.state.tasks[index]._id}`,)
+      .then((response) => {
+        const tasks = this.state.tasks.filter((task, j) => index !== j);
+        this.setState({tasks, editing:-1});
+      })
+      .catch((error) =>{
+        console.error(error)
+      })
+
   }
   editTask(index){
     this.setState({editing:index, editingTask:this.state.tasks[index]});
