@@ -34,6 +34,12 @@ class App extends React.Component {
       .catch((error) =>{
         console.error(error)
       })
+
+      window.addEventListener('keydown', e => {
+        if(e.key === "Escape") {
+          this.setState({editing:-1, showOpt: -1});
+        }
+      })
   }
 
   addTask(e){
@@ -53,7 +59,7 @@ class App extends React.Component {
     HttpClient.delete(`task/${this.state.tasks[index]._id}`,)
       .then((response) => {
         const tasks = this.state.tasks.filter((task, j) => index !== j);
-        this.setState({tasks, editing:-1});
+        this.setState({tasks, editing:-1, showOpt:-1});
       })
       .catch((error) =>{
         console.error(error)
@@ -71,7 +77,7 @@ class App extends React.Component {
           else
             return task;
         });
-        this.setState({tasks, editing:-1});
+        this.setState({tasks, editing:-1, showOpt:-1});
       })
       .catch((error) =>{
         console.error(error)
@@ -97,14 +103,15 @@ class App extends React.Component {
       })
   }
   editTask(index){
-    this.setState({editing:index, editedTaskDesc:this.state.tasks[index].description});
+    let newIndex=(index===this.state.showOpt)?index:-1;
+    this.setState({editing:index,showOpt:newIndex, editedTaskDesc:this.state.tasks[index].description});
   }
   handleChange(e){
     this.setState({[e.target.name]: e.target.value});
   }
   toggleOptions(index) {
     let newIndex=(index===this.state.showOpt)?-1:index;
-    this.setState({showOpt: newIndex});
+    this.setState({editing:-1, showOpt: newIndex});
 	}
   renderSingleTask(task, index, type){
     if(type !== task.completed) return "";
@@ -126,14 +133,14 @@ class App extends React.Component {
   }
   renderTasks(){
     if(this.state.tasks.length>0) return (
-      <div>
-        <div className="mb-5">
+      <div className="flex-col md:flex-row md:flex md:space-x-10">
+        <div className="mb-5 ">
           <Title title="To do" />
           {
             this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, false))
           }
         </div>
-        <div>
+        <div className="">
           <Title title="Completed" />
           {
             this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, true))
@@ -145,13 +152,15 @@ class App extends React.Component {
 
   render(){
     return (
-      <div className="bg-gray-70 h-full text-gray-800">
-        <Nav title="Todo List"></Nav>
-        <div className="p-10 pt-20 h-full text-gray-800">
+      <div className="bg-gray-70 h-full text-purple-900">
+        <Nav title="To do List"></Nav>
+        <div className="p-10 pt-20 h-full text-purple-900
+                        sm:p-20
+                        lg:pt-24">
           <Title title="Add Item" />
               <form className="flex space-x-5 pb-10">
                   <Input name="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
-                  <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-green-500" hover="bg-green-600"/>
+                  <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-purple-500" hover="bg-purple-600"/>
               </form>
             {this.renderTasks()}
             {/*<pre>
