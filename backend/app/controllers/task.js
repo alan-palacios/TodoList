@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Task = require('../models/task');
+const taskQuery = "_id description completed";
 module.exports = {
     addTask:async ({description}) =>{
         try{   
@@ -8,6 +9,7 @@ module.exports = {
 				completed: false
 			}
             let task = await new Task(newTask).save();
+            task = await module.exports.getTaskById(task._id);
             return task;
         }catch(error){
             console.log(error);
@@ -16,7 +18,7 @@ module.exports = {
     },
     getTasks:async function(){
         try{
-            const tasks = await Task.find({});
+            const tasks = await Task.find({}, taskQuery);
             if(!tasks) return -1;
             else return tasks;
         }catch(error){
@@ -26,7 +28,7 @@ module.exports = {
     },
     getTasksByQuery:async function({completed}){
         try{
-            const task = await Task.findOne({completed});
+            const task = await Task.findOne({completed}, taskQuery);
             if(!task) return -1;
             else return task;
         }catch(error){
@@ -36,7 +38,7 @@ module.exports = {
     },
     getTaskById:async function({id}){
         try{
-            const task = await Task.findOne({_id: new mongoose.Types.ObjectId(id)});
+            const task = await Task.findOne({_id: new mongoose.Types.ObjectId(id)}, taskQuery);
             if(!task) return -1;
             else return task;
         }catch(error){

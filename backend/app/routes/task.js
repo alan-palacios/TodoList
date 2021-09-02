@@ -29,7 +29,7 @@ router.get('/', async (req, resp, next) => {
     }   
 });
 //get all tasks by completed state
-router.get('/:completed', async (req, resp, next) => {
+router.get('/status/:completed', async (req, resp, next) => {
     if(req.params == null ){
         return resp.status(400).json({status:"error", description:"Wrong parameters"});
     }else{

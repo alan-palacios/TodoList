@@ -38,8 +38,7 @@ class App extends React.Component {
     if(this.state.taskDesc==='') return;
     HttpClient.post(`task`,{description:this.state.taskDesc})
       .then((response) => {
-        let tasks = [...this.state.tasks];
-        tasks.push(response.data.data);
+        let tasks = [...this.state.tasks,response.data.data];
         this.setState({tasks, taskDesc:''});
       })
       .catch((error) =>{
@@ -48,8 +47,7 @@ class App extends React.Component {
 
   }
   removeTask(index){
-    let tasks = this.state.tasks;
-    tasks.splice(index,1);
+    const tasks = this.state.tasks.filter((task, j) => index !== j);
     this.setState({tasks, editing:-1});
   }
   editTask(index){
