@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+axios.defaults.timeout = 4000; // for all requests
 const urlBase = 'http://localhost:5000'
 const commonHeaders ={
   Accept: 'application/json',
@@ -11,7 +12,7 @@ const readUrl = (url = '') =>
 const composeHeaders = (headers)=>
   ({
     ...commonHeaders,   
-    ...headers
+    ...headers,
   });
 
 const get = (url = '', headers = {}) => axios.get(readUrl(url), {

@@ -6,6 +6,7 @@ import Nav from './components/Nav';
 import Title from './components/Title';
 import Input from './components/Input';
 import ButtonIcon from './components/ButtonIcon';
+import { Animate }  from 'react-simple-animate';
 
 class App extends React.Component {
   constructor(props){
@@ -20,6 +21,7 @@ class App extends React.Component {
     this.state = {
       taskDesc: '',
       editedTaskDesc: '',
+      error:'',
       editing: -1,
       showOpt: -1,
       tasks: []
@@ -27,19 +29,21 @@ class App extends React.Component {
   }
 
   componentDidMount(){
+    window.addEventListener('keydown', e => {
+        if(e.key === "Escape") {
+          this.setState({editing:-1, showOpt: -1});
+        }
+    })
+
     HttpClient.get(`task`)
       .then((response) => {
         this.setState({tasks:response.data.data})
       })
       .catch((error) =>{
-        console.error(error)
+        this.changeErrorMessage(error);
       })
 
-      window.addEventListener('keydown', e => {
-        if(e.key === "Escape") {
-          this.setState({editing:-1, showOpt: -1});
-        }
-      })
+
   }
 
   addTask(e){
@@ -48,10 +52,10 @@ class App extends React.Component {
     HttpClient.post(`task`,{description:this.state.taskDesc})
       .then((response) => {
         let tasks = [...this.state.tasks,response.data.data];
-        this.setState({tasks, taskDesc:''});
+        this.setState({tasks, taskDesc:'', error:''});
       })
       .catch((error) =>{
-        console.error(error)
+        this.changeErrorMessage(error);
       })
 
   }
@@ -59,10 +63,10 @@ class App extends React.Component {
     HttpClient.delete(`task/${this.state.tasks[index]._id}`,)
       .then((response) => {
         const tasks = this.state.tasks.filter((task, j) => index !== j);
-        this.setState({tasks, editing:-1, showOpt:-1});
+        this.setState({tasks, editing:-1, showOpt:-1, error:''});
       })
       .catch((error) =>{
-        console.error(error)
+        this.changeErrorMessage(error);
       })
   }
   saveTask(index, e){
@@ -77,10 +81,10 @@ class App extends React.Component {
           else
             return task;
         });
-        this.setState({tasks, editing:-1, showOpt:-1});
+        this.setState({tasks, editing:-1, showOpt:-1, error:''});
       })
       .catch((error) =>{
-        console.error(error)
+        this.changeErrorMessage(error);
       })
   }
   checkboxChangeHandler(index){
@@ -96,10 +100,10 @@ class App extends React.Component {
             return task;
           }
         });
-        this.setState({tasks, editing:-1});
+        this.setState({tasks, editing:-1, error:''});
       })
       .catch((error) =>{
-        console.error(error)
+        this.changeErrorMessage(error);
       })
   }
   editTask(index){
@@ -113,6 +117,27 @@ class App extends React.Component {
     let newIndex=(index===this.state.showOpt)?-1:index;
     this.setState({editing:-1, showOpt: newIndex});
 	}
+  changeErrorMessage(err){
+    let message;
+    let code;
+    if (err.response) {
+      code =err.response.status;
+    }else{
+      code = err.code
+    }
+    switch (code) {
+      case 500:
+        message ="Database Error";
+        break;
+      case 401:
+        message ="Task Not Found";
+        break;
+      default:
+        message ="Cannot connect to server";
+        break;
+    }
+   this.setState({error:message});
+  }
   renderSingleTask(task, index, type){
     if(type !== task.completed) return "";
     const props = {
@@ -129,7 +154,9 @@ class App extends React.Component {
       checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
       saveTask: this.saveTask,
     }
-    return <Task key={index} {...props}/>   
+    return(
+        <Task key={index} {...props}/>
+    )    
   }
   renderTasks(){
     if(this.state.tasks.length>0) return (
@@ -161,13 +188,18 @@ class App extends React.Component {
               <form className="flex space-x-5 pb-10">
                   <Input name="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
                   <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-purple-500" hover="bg-purple-600"/>
+                  <span className="text-red-400">{this.state.error}</span>
               </form>
-            {this.renderTasks()}
-            {/*<pre>
-              {JSON.stringify(this.state,null,2)}
-            </pre>*/}
+              <Animate
+                play={this.state.tasks} duration={0.5}
+                end={{ opacity: 1}}
+                start={{ opacity: 0}}>
+                {this.renderTasks()}
+             </Animate>
+            <pre>
+              {/*JSON.stringify(this.state,null,2)*/}
+            </pre>
         </div>
-
       </div>
     );
   }
