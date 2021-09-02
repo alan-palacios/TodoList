@@ -40,8 +40,8 @@ function Task(props){
 			onComplete={props.checkboxChangeHandler}
             end={{ opacity: 0, transform: 'translate(0,-2rem) scale(1)'}}
             start={{ opacity: 1,transform: 'translate(0,0)'}}>
-			<div className={`mt-2 ${props.size} relative p-2 flex space-x-2 w-full rounded-lg border-2 ${props.completed?'border-purple-500':'border-purple-200'}`} key={props.index}>
-				<Checkbox value={props.completed!=disappear} checkboxChangeHandler={()=>setDisappear(!disappear)}/>
+			<div className={`mt-2 ${props.size} relative p-2 flex space-x-2 w-full lg:max-w-md rounded-lg border-2 ${props.completed?'border-purple-500':'border-purple-200'}`} key={props.index}>
+				<Checkbox value={props.completed!==disappear} checkboxChangeHandler={()=>setDisappear(!disappear)}/>
 				{renderLabel()}
 				<ButtonIcon icon="carbon:overflow-menu-vertical" background="" textColor="text-purple-700" onClick={props.toggleOptions}/>
 				<Animate

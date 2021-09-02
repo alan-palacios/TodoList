@@ -37,7 +37,8 @@ class App extends React.Component {
 
     HttpClient.get(`task`)
       .then((response) => {
-        this.setState({tasks:response.data.data})
+        const res = response.data.data;
+        this.setState({tasks:res.tasks})
       })
       .catch((error) =>{
         this.changeErrorMessage(error);
@@ -159,15 +160,21 @@ class App extends React.Component {
     )    
   }
   renderTasks(){
-    if(this.state.tasks.length>0) return (
+    //update number of uncompleted task only when removing or change the state of the task for more efficiency
+    const uncompleted = this.state.tasks.filter(item=>!item.completed).length;
+    return (
       <div className="flex-col md:flex-row md:flex md:space-x-10">
-        <div className="mb-5 ">
+        <div className="mb-5 md:w-1/2 ">
           <Title title="To do" />
-          {
-            this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, false))
-          }
+            {
+              (uncompleted>0)?
+                this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, false))
+                :
+                <span className="text-purple-400">You have finished all your tasks :)</span>
+            }
         </div>
-        <div className="">
+
+        <div className="md:w-1/2">
           <Title title="Completed" />
           {
             this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, true))
@@ -184,7 +191,7 @@ class App extends React.Component {
         <div className="p-10 pt-20 h-full text-purple-900
                         sm:p-20
                         lg:pt-24">
-          <Title title="Add Item" />
+          <Title title="Add Task" />
               <form className="flex space-x-5 pb-10">
                   <Input name="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
                   <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-purple-500" hover="bg-purple-600"/>
@@ -196,9 +203,6 @@ class App extends React.Component {
                 start={{ opacity: 0}}>
                 {this.renderTasks()}
              </Animate>
-            <pre>
-              {/*JSON.stringify(this.state,null,2)*/}
-            </pre>
         </div>
       </div>
     );

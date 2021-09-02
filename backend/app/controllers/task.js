@@ -20,7 +20,16 @@ module.exports = {
         try{
             const tasks = await Task.find({}, taskQuery);
             if(!tasks) return -1;
-            else return tasks;
+            else{
+                let completed = await Task.countDocuments({completed:true}).count();
+                let uncompleted = await Task.countDocuments({completed:false}).count();
+                const allTasks={
+                    tasks,
+                    completed,
+                    uncompleted
+                }
+                return allTasks;
+            } 
         }catch(error){
             console.log(error);
             return -2;
