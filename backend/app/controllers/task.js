@@ -67,7 +67,7 @@ module.exports = {
             else{
                 const task = await Task.findByIdAndUpdate(id, {
                     $set: updatedTask,
-                }, {new:true});
+                }, {new:true, select: taskQuery});
                 if(!taskExist) return -1;
                 else return task;
             }

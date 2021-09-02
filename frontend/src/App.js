@@ -13,12 +13,15 @@ class App extends React.Component {
     this.addTask = this.addTask.bind(this);
     this.removeTask = this.removeTask.bind(this);
     this.editTask = this.editTask.bind(this);
-    this.updateTask = this.updateTask.bind(this);
     this.saveTask = this.saveTask.bind(this);
     this.checkboxChangeHandler = this.checkboxChangeHandler.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.toggleOptions = this.toggleOptions.bind(this);
     this.state = {
       taskDesc: '',
+      editedTaskDesc: '',
       editing: -1,
+      showOpt: -1,
       tasks: []
     }
   }
@@ -56,19 +59,23 @@ class App extends React.Component {
         console.error(error)
       })
   }
-  editTask(index){
-    this.setState({editing:index, editingTask:this.state.tasks[index]});
-  }
-  updateTask(index, value){
-    let tasks = this.state.tasks;
-    tasks[index]=value;
-    this.setState({"tasks":tasks});
-  }
-  saveTask(){
-    this.setState({editing:-1});
-  }
-  handleChange(e){
-    this.setState({[e.target.name]: e.target.value});
+  saveTask(index, e){
+    e?.preventDefault();
+    let updatedTask = {...this.state.tasks[index]};
+    updatedTask.description = this.state.editedTaskDesc;
+    HttpClient.put(`task/${updatedTask._id}`, updatedTask)
+      .then((response) => {
+        const tasks = this.state.tasks.map((task, j) =>{
+          if (index===j)
+            return response.data.data;    
+          else
+            return task;
+        });
+        this.setState({tasks, editing:-1});
+      })
+      .catch((error) =>{
+        console.error(error)
+      })
   }
   checkboxChangeHandler(index){
     let updatedTask = {...this.state.tasks[index]};
@@ -89,49 +96,47 @@ class App extends React.Component {
         console.error(error)
       })
   }
+  editTask(index){
+    this.setState({editing:index, editedTaskDesc:this.state.tasks[index].description});
+  }
+  handleChange(e){
+    this.setState({[e.target.name]: e.target.value});
+  }
+  toggleOptions(index) {
+    let newIndex=(index===this.state.showOpt)?-1:index;
+    this.setState({showOpt: newIndex});
+	}
+  renderSingleTask(task, index, type){
+    if(type !== task.completed) return "";
+    const props = {
+      index,
+      showOpt:this.state.showOpt,
+      editedTaskDesc:this.state.editedTaskDesc,
+      desc:task.description,
+      completed: task.completed,
+      editable: this.state.editing===index,
+      removeTask: this.removeTask,
+      editTask: this.editTask,
+      handleChange: this.handleChange,
+      toggleOptions: ()=>this.toggleOptions(index),
+      checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
+      saveTask: this.saveTask,
+    }
+    return <Task key={index} {...props}/>   
+  }
   renderTasks(){
     if(this.state.tasks.length>0) return (
       <div>
         <div className="mb-5">
           <Title title="To do" />
           {
-            this.state.tasks.map( (task,index) =>{
-              if(task.completed) return "";
-              const props = {
-                index,
-                desc:task.description,
-                completed: task.completed,
-                editable: this.state.editing===index,
-                removeTask: this.removeTask,
-                editTask: this.editTask,
-                updateTask: this.updateTask,
-                handleChange: this.handleChange,
-                checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
-                saveTask: this.saveTask,
-              }
-              return <Task key={index} {...props}/>
-            })
+            this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, false))
           }
         </div>
         <div>
           <Title title="Completed" />
           {
-            this.state.tasks.map( (task,index) =>{
-              if(!task.completed) return "";
-              const props = {
-                index,
-                desc:task.description,
-                completed: task.completed,
-                editable: this.state.editing===index,
-                removeTask: this.removeTask,
-                editTask: this.editTask,
-                updateTask: this.updateTask,
-                handleChange: this.handleChange,
-                checkboxChangeHandler: ()=>this.checkboxChangeHandler(index),
-                saveTask: this.saveTask,
-              }
-              return <Task key={index} {...props}/>
-            })
+            this.state.tasks.map( (task,index) =>this.renderSingleTask(task,index, true))
           }
         </div>
       </div>
@@ -146,12 +151,12 @@ class App extends React.Component {
           <Title title="Add Item" />
               <form className="flex space-x-5 pb-10">
                   <Input name="taskDesc" onChange={e=>this.handleChange(e)} value={this.state.taskDesc} label="Task"/>
-                  <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-green-500"/>
+                  <ButtonIcon type="submit" onClick={e=>this.addTask(e)}  icon="carbon:add" background="bg-green-500" hover="bg-green-600"/>
               </form>
             {this.renderTasks()}
-            <pre>
+            {/*<pre>
               {JSON.stringify(this.state,null,2)}
-            </pre>
+            </pre>*/}
         </div>
 
       </div>
